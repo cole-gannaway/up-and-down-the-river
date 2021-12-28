@@ -1,56 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import { get, onValue, ref } from 'firebase/database';
+import React, { useEffect } from 'react';
+import { db } from './config/firebase';
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import { selectJoinedLobby, selectLobbyCode, selectLobbyUUID, selectOfflineMode, setLobbyUUID, setOfflineMode } from './features/app-state';
+import Login from './Login';
+import Main from './Main';
+import { setLobbyName, setLobbyHistory, setLobbyScoreboard } from './features/lobby';
 
 function App() {
+  const dispatch = useAppDispatch();
+  const joinedLobby = useAppSelector(selectJoinedLobby);
+  const offline = useAppSelector(selectOfflineMode);
+  const lobbyUUID = useAppSelector(selectLobbyUUID);
+
+  useEffect(() => {
+    let unsubscribe = () => { };
+    if (lobbyUUID) {
+      const lobbyRef = ref(db, "lobbies/" + lobbyUUID);
+
+      // subscribe
+      unsubscribe = onValue(lobbyRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const lobby = snapshot.val();
+          console.log(lobby.data);
+          dispatch(setLobbyName(lobby.data.lobbyname))
+          dispatch(setLobbyScoreboard(lobby.data.scoreboard))
+          dispatch(setLobbyHistory({ ...lobby.data.history }))
+        } else {
+          console.log('No data available');
+        }
+      });
+    }
+
+    return () => {
+      unsubscribe();
+    }
+  }, [dispatch, lobbyUUID])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
+    <div>
+      {/* header */}
+      <div>
+        Offline <input type="checkbox" checked={offline} onChange={(e) => dispatch(setOfflineMode(e.target.checked))}></input>
+      </div>
+      {joinedLobby === false ? <Login></Login> : <Main></Main>}
     </div>
   );
 }
