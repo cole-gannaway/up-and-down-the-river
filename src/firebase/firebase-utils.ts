@@ -2,7 +2,7 @@ import { Database, DatabaseReference, get, ref, remove, set, update } from 'fire
 
 import { v4 as uuidv4 } from 'uuid';
 import { createEmptyLobbyData } from '../features/lobby';
-import { LobbyData, PlayerData, PlayerDataDict, RoundData, ScoreboardData, ScoreboardDataDict } from '../interfaces/ILobbyData';
+import { LobbyData, PlayerDataDict, RoundData, ScoreboardDataDict } from '../interfaces/ILobbyData';
 
 /**
  * Generates a random code for a lobby
@@ -11,7 +11,7 @@ import { LobbyData, PlayerData, PlayerDataDict, RoundData, ScoreboardData, Score
 export function generateRandomLobbyCode() {
   const length = 4;
   var result = '';
-  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   var charactersLength = characters.length;
   for (var i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() *

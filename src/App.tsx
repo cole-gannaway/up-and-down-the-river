@@ -7,6 +7,7 @@ import Login from './Login';
 import Main from './Main';
 import {  setLobbyData } from './features/lobby';
 import { LobbyData } from './interfaces/ILobbyData';
+import img from './assets/card-game-64.png'
 
 function App() {
   const dispatch = useAppDispatch();
@@ -36,7 +37,10 @@ function App() {
   }, [dispatch, lobbyUUID])
   
   return (
-    <div>
+    <div style={{textAlign: "center"}}>
+      <div >
+        <h2>Up And Down The River <img src={img} alt="Logo" /></h2>
+      </div>
       {isLoggedIn === false ? <Login></Login> : <Main></Main>}
     </div>
   );

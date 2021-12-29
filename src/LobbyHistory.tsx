@@ -23,7 +23,7 @@ export function LobbyHistory(){
         })
         Object.keys(history).forEach((roundStr,i) => {
             const round = parseInt(roundStr);
-            headers.push(<th key={"header-round-" + round}>{round}</th>)
+            headers.push(<th key={"header-round-" + round}>Round {round}</th>)
         })
     }
     

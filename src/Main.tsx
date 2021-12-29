@@ -1,19 +1,24 @@
+import { Button, Switch } from '@mui/material';
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { db } from './config/firebase';
 import {  selectLobbyCode, selectLobbyUUID, selectName, setIsLoggedIn, setLobbyCode, setLobbyUUID } from './features/app-state';
 import { selectLobbyData } from './features/lobby';
 import { deleteLobby, deletePlayerFromLobby, updateHistory, updateScoreboard, updateRoundData, transformPlayersDataIntoAnArray } from './firebase/firebase-utils';
-import { PlayerData, PlayerDataDict, RoundData, ScoreboardData, ScoreboardDataDict } from './interfaces/ILobbyData';
+import { PlayerDataDict, RoundData, ScoreboardDataDict } from './interfaces/ILobbyData';
 import { LobbyHistory } from './LobbyHistory';
+
+import CheckIcon from '@mui/icons-material/Check';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 
 function Main() {
   const dispatch = useAppDispatch();
 
   const lobby = useAppSelector(selectLobbyData);
   const playersData = transformPlayersDataIntoAnArray(lobby.live.players);
-  const [hideHistory, setHideHistory] = useState(false);
-  
+  const [hideHistory, setHideHistory] = useState(true);
   const name = useAppSelector(selectName)
   const lobbyUUID = useAppSelector(selectLobbyUUID);
   const lobbyCode = useAppSelector(selectLobbyCode);
@@ -96,40 +101,46 @@ function Main() {
 
   return (
     <div>
-      <button disabled={deleteLobbyDisabled} onClick={handleDeleteLobby}>Delete</button>
-      <h2>Logged In {name}</h2>
       <div>
+        <div><h4 style={{display: "inline-block"}}>Welcome '{name}'!</h4> <h4 style={{display: "inline-block"}}>Lobby Code: '</h4><h4 style={{display: "inline-block", color: "blue"}}>{lobbyCode}</h4><h4 style={{display: "inline-block"}}>'</h4></div>
         <div>
-          <button onClick={() => changeRound(lobby.live.roundData.round - 1)}>{"<"}</button> Round {lobby.live.roundData.round} <button onClick={() => changeRound(lobby.live.roundData.round + 1)}>{">"}</button>
+          <h3><Button onClick={() => changeRound(lobby.live.roundData.round - 1)}><ArrowBackIosIcon></ArrowBackIosIcon></Button> Round {lobby.live.roundData.round} <Button onClick={() => changeRound(lobby.live.roundData.round + 1)}><ArrowForwardIosIcon></ArrowForwardIosIcon></Button></h3>
         </div>
-        Cards <input value={lobby.live.roundData.cards} onChange={(e) => handleRoundDataUpdate({ cards: parseNumber(e), isJeopardyMode: lobby.live.roundData.isJeopardyMode, round : lobby.live.roundData.round})}></input>
+        <div>
+          Cards <input pattern="[0-9]*" style={{width: 50}} value={lobby.live.roundData.cards} onChange={(e) => handleRoundDataUpdate({ cards: parseNumber(e), isJeopardyMode: lobby.live.roundData.isJeopardyMode, round : lobby.live.roundData.round})}></input>
+        </div>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Bid</th>
-            <th>Name</th>
-            <th>Score</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {playersData.map((data) => {
-            return <tr key={data.name}>
-              <td><button onClick={() => {handleUpdateScoreboard({[data.name]: { bid: data.bid, score: (data.score + data.bid + 10) }})}}>checkmark</button></td>
-              <td><input type="number" value={data.bid} onChange={(e) => handleUpdateScoreboard({[data.name]: {bid:parseNumber(e), score: data.score}})}></input></td>
-              <td>{data.name}</td>
-              <td><input type="number" value={data.score} onChange={(e) => handleUpdateScoreboard({[data.name]: {bid:data.bid, score: parseNumber(e)}})}></input></td>
-              <td><button disabled={lobbyUUID ? false : true} onClick={() => { if (lobbyUUID) deletePlayerFromLobby(db, data.name, lobbyUUID) }}>x</button> </td>
+      <div>
+        <table style={{marginLeft : "auto", marginRight: "auto"}}>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Bid</th>
+              <th>Name</th>
+              <th>Score</th>
+              <th></th>
             </tr>
-          })
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {playersData.map((data) => {
+              return <tr key={data.name}>
+                <td><Button color="success" onClick={() => {handleUpdateScoreboard({[data.name]: { bid: data.bid, score: (data.score + data.bid + 10) }})}}><CheckIcon></CheckIcon></Button></td>
+                <td><input type="number" pattern="[0-9]*" style={{width: 50}} value={data.bid} onChange={(e) => handleUpdateScoreboard({[data.name]: {bid:parseNumber(e), score: data.score}})}></input></td>
+                <td>{data.name}</td>
+                <td><input type="number" pattern="[0-9]*" style={{width: 90}} value={data.score} onChange={(e) => handleUpdateScoreboard({[data.name]: {bid:data.bid, score: parseNumber(e)}})}></input></td>
+                <td><Button color="error" disabled={lobbyUUID ? false : true} onClick={() => { if (lobbyUUID) deletePlayerFromLobby(db, data.name, lobbyUUID) }}> <DeleteIcon></DeleteIcon> </Button> </td>
+              </tr>
+            })
+            }
+          </tbody>
+        </table>
+      </div>
       {/* Scoreboard */}
       <div>
-        Hide history <input type="checkbox" checked={hideHistory} onChange={(e) => setHideHistory(!hideHistory)}></input>
+        History <Switch checked={hideHistory} onChange={(e) => setHideHistory(!hideHistory)} />
+        
+        <Button color="error" variant="outlined" disabled={deleteLobbyDisabled} onClick={handleDeleteLobby} >Delete Lobby</Button>
+
       </div>
       <div hidden={hideHistory}>
         <LobbyHistory></LobbyHistory>
