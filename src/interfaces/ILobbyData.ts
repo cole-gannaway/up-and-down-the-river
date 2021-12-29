@@ -1,33 +1,43 @@
 /**
  * Contains all of the information associated with a lobby
  */
-export interface ILobbyData {
+export interface App {
+  lobbies: LobbyDict;
+  lobbycodes: LobbyCodesDict;
+}
+export interface LobbyCodesDict {
+  [code: string]: [lobbyId: string];
+}
+export interface LobbyDict {
+  [lobbyUUID: string] : LobbyData;
+}
+export interface LobbyData {
+  metadata: LobbyMetadata;
+  live: ScoreboardData;
+  history: ScoreboardDataDict | null;
+}
+export interface LobbyMetadata {
   lobbyname: string;
-  scoreboard: IScoreBoardInfo;
-  history: IHistoryInfo;
+}
+export interface ScoreboardData {
+  roundData: RoundData;
+  players: PlayerDataDict;
 }
 
-/**
- * Player id to score
- */
-export interface IScoreBoardInfo {
-  [id: string]: {
-    score: number;
-    bid: number;
-  };
+export interface RoundData {
+  cards: number;
+  isJeopardyMode: boolean;
+  round: number;
+}
+export interface PlayerDataDict {
+  [playerName: string]: PlayerData
+}
+export interface PlayerData {
+  bid: number;
+  score: number;
 }
 
-/**
- * Round -> Player id to bid & score adjustments
- */
-export interface IHistoryInfo {
-  [roundId: number]: {
-    cards: number;
-    players: {
-      [id: string]: {
-        bid: number;
-        scoreAdjustment: number;
-      };
-    };
-  };
+export interface ScoreboardDataDict{
+  [round: number] : ScoreboardData
 }
+

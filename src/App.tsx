@@ -1,16 +1,16 @@
-import { get, onValue, ref } from 'firebase/database';
+import { onValue, ref } from 'firebase/database';
 import React, { useEffect } from 'react';
 import { db } from './config/firebase';
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { selectJoinedLobby, selectLobbyCode, selectLobbyUUID, selectOfflineMode, setLobbyUUID, setOfflineMode } from './features/app-state';
+import { selectIsLoggedIn, selectLobbyUUID} from './features/app-state';
 import Login from './Login';
 import Main from './Main';
-import { setLobbyName, setLobbyHistory, setLobbyScoreboard } from './features/lobby';
+import {  setLobbyData } from './features/lobby';
+import { LobbyData } from './interfaces/ILobbyData';
 
 function App() {
   const dispatch = useAppDispatch();
-  const joinedLobby = useAppSelector(selectJoinedLobby);
-  const offline = useAppSelector(selectOfflineMode);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const lobbyUUID = useAppSelector(selectLobbyUUID);
 
   useEffect(() => {
@@ -18,14 +18,12 @@ function App() {
     if (lobbyUUID) {
       const lobbyRef = ref(db, "lobbies/" + lobbyUUID);
 
-      // subscribe
+      // subscribe to updates on the database
+      // this is how data updates from client -> database -> client
       unsubscribe = onValue(lobbyRef, (snapshot) => {
         if (snapshot.exists()) {
-          const lobby = snapshot.val();
-          console.log(lobby.data);
-          dispatch(setLobbyName(lobby.data.lobbyname))
-          dispatch(setLobbyScoreboard(lobby.data.scoreboard))
-          dispatch(setLobbyHistory({ ...lobby.data.history }))
+          const lobby = snapshot.val() as LobbyData;
+          dispatch(setLobbyData(lobby))
         } else {
           console.log('No data available');
         }
@@ -36,13 +34,10 @@ function App() {
       unsubscribe();
     }
   }, [dispatch, lobbyUUID])
+  
   return (
     <div>
-      {/* header */}
-      <div>
-        Offline <input type="checkbox" checked={offline} onChange={(e) => dispatch(setOfflineMode(e.target.checked))}></input>
-      </div>
-      {joinedLobby === false ? <Login></Login> : <Main></Main>}
+      {isLoggedIn === false ? <Login></Login> : <Main></Main>}
     </div>
   );
 }
