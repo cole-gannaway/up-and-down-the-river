@@ -29,7 +29,7 @@ export function LobbyHistory(){
     
     
     return <div>
-        <table>
+        <table style={{marginLeft : "auto", marginRight: "auto"}}>
             <thead>
                 <tr>
                     <th>Name</th>
