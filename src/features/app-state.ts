@@ -6,6 +6,7 @@ export interface AppState {
   isLoggedIn: boolean;
   lobbyCode: string;
   lobbyUUID: string | null;
+  playerUUID: string | null;
 }
 
 const initialState: AppState = {
@@ -13,6 +14,7 @@ const initialState: AppState = {
   lobbyCode: '',
   lobbyUUID: null,
   name: '',
+  playerUUID: '',
 };
 
 export const appSlice = createSlice({
@@ -31,6 +33,9 @@ export const appSlice = createSlice({
     setName: (state, action: PayloadAction<string>) => {
       state.name = action.payload;
     },
+    setPlayerUUID: (state, action: PayloadAction<string | null>) => {
+      state.playerUUID = action.payload;
+    },
   },
 });
 
@@ -45,5 +50,6 @@ export const selectIsLoggedIn = (state: RootState) => state.app.isLoggedIn;
 export const selectName = (state: RootState) => state.app.name;
 export const selectLobbyCode = (state: RootState) => state.app.lobbyCode;
 export const selectLobbyUUID = (state: RootState) => state.app.lobbyUUID;
+export const selectPlayerUUID = (state: RootState) => state.app.playerUUID;
 
 export default appSlice.reducer;

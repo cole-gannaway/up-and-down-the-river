@@ -45,12 +45,12 @@ export function Scoreboard() {
             </thead>
             <tbody>
                 {playersData.map((data) => {
-                    return <tr key={data.name}>
-                        <td><Button color="success" onClick={() => { handleUpdateScoreboard({ [data.name]: { bid: data.bid, score: (data.score + data.bid + 10) } }) }}><CheckIcon></CheckIcon></Button></td>
-                        <td><TextField type="number" size="small" inputProps={{ pattern: "[0-9]*" }} style={{ width: 60 }} value={data.bid} onChange={(e) => handleUpdateScoreboard({ [data.name]: { bid: parseNumber(e.target.value), score: data.score } })}></TextField></td>
-                        <td><TextField type="text" size="small" style={{ width: 160 }} value={data.name} disabled={true}></TextField></td>
-                        <td><TextField type="number" size="small" inputProps={{ pattern: "[0-9]*" }} style={{ width: 80 }} value={data.score} onChange={(e) => handleUpdateScoreboard({ [data.name]: { bid: data.bid, score: parseNumber(e.target.value) } })}></TextField></td>
-                        <td><Button color="error" disabled={lobbyUUID ? false : true} onClick={() => { if (lobbyUUID) deletePlayerFromLobby(db, data.name, lobbyUUID) }}> <DeleteIcon></DeleteIcon> </Button> </td>
+                    return <tr key={data.uuid}>
+                        <td><Button color="success" onClick={() => { handleUpdateScoreboard({ [data.uuid]: { bid: data.bid, score: (data.score + data.bid + 10), name: data.name } }) }}><CheckIcon></CheckIcon></Button></td>
+                        <td><TextField type="number" size="small" inputProps={{ pattern: "[0-9]*" }} style={{ width: 60 }} value={data.bid} onChange={(e) => handleUpdateScoreboard({ [data.uuid]: { bid: parseNumber(e.target.value), score: data.score, name: data.name } })} tabIndex={1}></TextField></td>
+                        <td><TextField type="text" size="small" inputProps={{ pattern: "[A-Za-z]*" }} style={{ width: 160 }} value={data.name} onChange={(e) => { handleUpdateScoreboard({ [data.uuid]: { bid: data.bid, score: data.score, name: e.target.value.toLocaleUpperCase() } }) }} tabIndex={3}></TextField></td>
+                        <td><TextField type="number" size="small" inputProps={{ pattern: "[0-9]*" }} style={{ width: 80 }} value={data.score} onChange={(e) => handleUpdateScoreboard({ [data.uuid]: { bid: data.bid, score: parseNumber(e.target.value), name: data.name } })} tabIndex={2}></TextField></td>
+                        <td><Button color="error" disabled={lobbyUUID ? false : true} onClick={() => { if (lobbyUUID) deletePlayerFromLobby(db, data.uuid, lobbyUUID) }}> <DeleteIcon></DeleteIcon> </Button> </td>
                     </tr>
                 })
                 }

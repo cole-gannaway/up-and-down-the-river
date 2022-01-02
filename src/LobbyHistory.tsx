@@ -9,17 +9,18 @@ export function LobbyHistory(){
     const headers : any[] = [];
     const rows : any[] = [];
     if (history){
-        const playerNames = getAllPlayerNamesFromHistory(history);
-        playerNames.forEach((playerName) => {
+        const playerUUIDToName = getAllPlayerUUIDsFromHistory(history);
+        const playerUUIDs = Object.keys(playerUUIDToName);
+        playerUUIDs.forEach((playerUUID) => {
             const dataCells: any[] = [];
             Object.keys(history).forEach((roundStr,i) => {
                 const round = parseInt(roundStr);
                 const scoreboard = history[round];
-                const playerData = scoreboard.players[playerName]
+                const playerData = scoreboard.players[playerUUID]
                 const score = playerData ? playerData.score : 0;
-                dataCells.push(<td key={"data-"+playerName + "-" + roundStr}>{score}</td>)
+                dataCells.push(<td key={"data-"+playerUUID + "-" + roundStr}>{score}</td>)
             })
-            rows.push(<tr key={"row-" + playerName}><td>{playerName}</td>{dataCells}</tr>)
+            rows.push(<tr key={"row-" + playerUUID}><td>{playerUUIDToName[playerUUID]}</td>{dataCells}</tr>)
         })
         Object.keys(history).forEach((roundStr,i) => {
             const round = parseInt(roundStr);
@@ -43,12 +44,16 @@ export function LobbyHistory(){
     </div>
 }
 
-function getAllPlayerNamesFromHistory(history: ScoreboardDataDict) {
-    const playerNamesSet : Set<string> = new Set<string>();
+function getAllPlayerUUIDsFromHistory(history: ScoreboardDataDict) {
+    const playerUUIDToName : {[uuid: string] : string}  = {};
     Object.keys(history).forEach((roundStr,i) => {
         const round = parseInt(roundStr);
         const scoreboard = history[round];
-        Object.keys(scoreboard.players).forEach((name) => playerNamesSet.add(name));
+        Object.entries(scoreboard.players).forEach((entry) => {
+            const playerUUID = entry[0];
+            const playerName = entry[1].name
+            playerUUIDToName[playerUUID] = playerName;
+        });
     })
-    return Array.from(playerNamesSet.values());
+    return playerUUIDToName;
 }

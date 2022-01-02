@@ -4,9 +4,10 @@ import React from 'react';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { db } from './config/firebase';
 import { selectLobbyCode, selectName, setIsLoggedIn, setLobbyCode, setLobbyUUID, setName } from './features/app-state';
-import { addPlayerToLobby, createNewLobby, getLobbyUUID, isPlayerInLobby } from './firebase/firebase-utils';
+import { addPlayerToLobby, createNewLobby, getLobbyUUID, findPlayerByNameInLobby } from './firebase/firebase-utils';
 import { validateText } from './utils/utils';
 import { useSnackbar } from 'notistack';
+import { v4 as uuidv4 } from 'uuid';
 
 function Login() {
   const dispatch = useAppDispatch();
@@ -22,11 +23,11 @@ function Login() {
     // get lobby UUID
     const lobbyUUID = await getLobbyUUID(db, lobbyCode);
     if (lobbyUUID) {
-      let playerIsInLobby = await isPlayerInLobby(db, lobbyUUID, name);
-      if (!playerIsInLobby) {
-        playerIsInLobby = await addPlayerToLobby(db, name, lobbyUUID);
+      let playerUUID = await findPlayerByNameInLobby(db, lobbyUUID, name);
+      if (!playerUUID) {
+        playerUUID = await addPlayerToLobby(db, name, lobbyUUID);
       }
-      if (playerIsInLobby) {
+      if (playerUUID) {
         dispatch(setLobbyUUID(lobbyUUID));
         dispatch(setIsLoggedIn(true))
         return true;

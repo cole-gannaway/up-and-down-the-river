@@ -30,9 +30,10 @@ export interface RoundData {
   round: number;
 }
 export interface PlayerDataDict {
-  [playerName: string]: PlayerData
+  [playerUUID: string]: PlayerData
 }
 export interface PlayerData {
+  name: string;
   bid: number;
   score: number;
 }

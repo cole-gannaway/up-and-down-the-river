@@ -98,43 +98,46 @@ export async function deleteLobby(db: Database, lobbyCode: string, lobbyUUID: st
   remove(lobbyRef);
 }
 
-export async function isPlayerInLobby(db: Database, lobbyUUID: string, playerName: string) {
-  const path = firebasePathConcat(["lobbies", lobbyUUID, "live", "players", playerName]);
-  const lobbyScoreboardPlayerRef = ref(db, path);
+export async function findPlayerByNameInLobby(db: Database, lobbyUUID: string, playerName: string) {
+  const path = firebasePathConcat(["lobbies", lobbyUUID, "live", "players"]);
+  const playersRef = ref(db, path);
   let retVal: boolean = false;
   try {
-    const snapshot = await get(lobbyScoreboardPlayerRef)
+    const snapshot = await get(playersRef)
     if (snapshot.exists()) {
-      retVal = true;
+      const players = snapshot.val() as PlayerDataDict;
+      const foundPlayer = Object.entries(players).find((entry) => entry[1].name === playerName);
+      if (foundPlayer){
+        return foundPlayer[0]
+      }
     }
   } catch (e) {
-    retVal = false;
+    console.error(e);
   }
-  return retVal;
+  return null;
 }
 
-export async function addPlayerToLobby(db: Database, playerName: string, lobbyUUID: string) {
+export async function addPlayerToLobby(db: Database, playerName :string, lobbyUUID: string) {
   console.log("Adding player " + playerName + " to lobby " + lobbyUUID);
   // add player only if the player is NOT in the lobby
   const lobbyScoreboardRef = ref(db, firebasePathConcat(["lobbies", lobbyUUID, "live", "players"]));
+  const playerUUID = uuidv4();
   const scoreboardUpdate: PlayerDataDict = {
-    [playerName]: {
+    [playerUUID]: {
       bid: 0,
-      score: 0
+      score: 0,
+      name: playerName
     }
   }
   const successful = await updateAndMergeData(lobbyScoreboardRef, scoreboardUpdate)
-  return successful;
+  if (successful) return playerUUID;
+  else return null;
 }
 
-export async function deletePlayerFromLobby(db: Database, playerName: string, lobbyUUID: string) {
-  console.log("Deleting player " + playerName + " from lobby " + lobbyUUID);
-  // remove player only if the player is in the lobby
-  const playerExists = await isPlayerInLobby(db, lobbyUUID, playerName);
-  if (playerExists) {
-    const playerRef = ref(db, firebasePathConcat(["lobbies", lobbyUUID, "live", "players", playerName]));
-    remove(playerRef);
-  }
+export async function deletePlayerFromLobby(db: Database, playerUUID: string, lobbyUUID: string) {
+  console.log("Deleting player " + playerUUID + " from lobby " + lobbyUUID);
+  const playerRef = ref(db, firebasePathConcat(["lobbies", lobbyUUID, "live", "players", playerUUID]));
+  remove(playerRef);
 }
 
 export async function updateRoundData(db: Database, roundDataUpdate: RoundData, lobbyUUID: string) {
@@ -224,7 +227,8 @@ function firebasePathConcat(arr: string[]) {
 export function transformPlayersDataIntoAnArray(playerDataDict: PlayerDataDict){
   return Object.keys(playerDataDict).map((key) => {
     return {
-      name: key,
+      uuid: key,
+      name: playerDataDict[key].name, 
       bid: playerDataDict[key].bid,
       score: playerDataDict[key].score
     }
