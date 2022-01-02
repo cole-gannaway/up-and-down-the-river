@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from './app/hooks';
 import { db } from './config/firebase';
 import { selectLobbyCode, selectLobbyUUID, selectName, setIsLoggedIn, setLobbyCode, setLobbyUUID } from './features/app-state';
 import { selectLobbyData } from './features/lobby';
-import { deleteLobby, updateHistory, updateScoreboard, updateRoundData, transformPlayersDataIntoAnArray, addPlayerToLobby, generateRandomLobbyCode } from './firebase/firebase-utils';
+import { deleteLobby, updateHistory, updateScoreboard, updateRoundData, addPlayerToLobby, generateRandomLobbyCode } from './firebase/firebase-utils';
 import { PlayerDataDict, RoundData, ScoreboardDataDict } from './interfaces/ILobbyData';
 import { LobbyHistory } from './LobbyHistory';
 import { Scoreboard } from './Scoreboard';
@@ -16,9 +16,10 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 function Main() {
   const dispatch = useAppDispatch();
 
+  const [showHistory, setShowHistory] = useState(false);
+
   const lobby = useAppSelector(selectLobbyData);
-  const playersData = transformPlayersDataIntoAnArray(lobby.live.players);
-  const [hideHistory, setHideHistory] = useState(true);
+  const roundData = lobby.live.roundData;
   const name = useAppSelector(selectName)
   const lobbyUUID = useAppSelector(selectLobbyUUID);
   const lobbyCode = useAppSelector(selectLobbyCode);
@@ -37,9 +38,9 @@ function Main() {
 
   const deleteLobbyDisabled = !(lobbyUUID);
 
-  async function handleRoundDataUpdate(roundDataUpdate: RoundData) {
+  async function handleRoundDataUpdate(roundDataUpdate: Partial<RoundData>) {
     if (lobbyUUID) {
-      await updateRoundData(db, roundDataUpdate, lobbyUUID);
+      await updateRoundData(db, roundDataUpdate, roundData, lobbyUUID);
     }
   }
 
@@ -78,17 +79,20 @@ function Main() {
       updateHistory(db, historyUpdate, lobbyUUID);
 
       // change round
-      const roundDataUpdate: RoundData = {
+      const roundDataUpdate: Partial<RoundData> = {
         cards: calculateCards(newRound),
-        isJeopardyMode: lobby.live.roundData.isJeopardyMode,
-        round: newRound
+        round: newRound,
+        isJeopardyModeRoundFinished: false,
       }
-      updateRoundData(db, roundDataUpdate, lobbyUUID);
+      updateRoundData(db, roundDataUpdate, roundData, lobbyUUID);
 
-      // reset bids
+      // reset bids and wagers
       const scoreboardUpdate: PlayerDataDict = {}
-      Object.keys(lobby.live.players).forEach((playerName) => scoreboardUpdate[playerName] = { bid: 0, score: lobby.live.players[playerName].score, name: lobby.live.players[playerName].name });
-      updateScoreboard(db, scoreboardUpdate, lobbyUUID)
+      Object.keys(lobby.live.players).forEach((playerName) => {
+        const playerData = lobby.live.players[playerName];
+        scoreboardUpdate[playerName] = { bid: 0, wager: 0, score: playerData.score, name: playerData.name}
+      });
+      updateScoreboard(db, scoreboardUpdate, lobby.live.players, lobbyUUID)
     }
 
   }
@@ -107,18 +111,22 @@ function Main() {
           <h3><Button onClick={() => changeRound(lobby.live.roundData.round - 1)}><ArrowBackIosIcon></ArrowBackIosIcon></Button> Round {lobby.live.roundData.round} <Button onClick={() => changeRound(lobby.live.roundData.round + 1)}><ArrowForwardIosIcon></ArrowForwardIosIcon></Button></h3>
         </div>
         <div>
-          <TextField label="Cards" size="small" type="number" inputProps={{ pattern: "[0-9]*" }} style={{ width: 60 }} value={lobby.live.roundData.cards} onChange={(e) => handleRoundDataUpdate({ cards: parseNumber(e.target.value), isJeopardyMode: lobby.live.roundData.isJeopardyMode, round: lobby.live.roundData.round })}></TextField>
+          <TextField label="Cards" size="small" type="number" inputProps={{ pattern: "[0-9]*" }} style={{ width: 60 }} value={lobby.live.roundData.cards} onChange={(e) => handleRoundDataUpdate({ cards: parseNumber(e.target.value) })}></TextField>
           <Button variant="outlined" onClick={handleAddPlayer}><PersonAddIcon></PersonAddIcon></Button>
         </div>
       </div>
       <Scoreboard></Scoreboard>
       <div>
-        History <Switch checked={hideHistory} onChange={(e) => setHideHistory(!hideHistory)} />
-        <Button color="error" variant="outlined" disabled={deleteLobbyDisabled} onClick={handleDeleteLobby} >Delete Lobby</Button>
+        History <Switch checked={showHistory} onChange={(e) => setShowHistory(!showHistory)} />
+        Jeopardy Mode <Switch checked={roundData.isJeopardyMode} onChange={(e) => {if (lobbyUUID) updateRoundData(db,{isJeopardyMode: !roundData.isJeopardyMode}, roundData ,lobbyUUID)}} />
+        <div hidden={!roundData.isJeopardyMode}>
+        Jeopardy Round Complete <Switch checked={roundData.isJeopardyModeRoundFinished} onChange={(e) => {if (lobbyUUID) updateRoundData(db,{isJeopardyModeRoundFinished: !roundData.isJeopardyModeRoundFinished}, roundData ,lobbyUUID)}} />
+        </div>
       </div>
-      <div hidden={hideHistory}>
+      <div hidden={!showHistory}>
         <LobbyHistory></LobbyHistory>
       </div>
+      <Button color="error" variant="outlined" disabled={deleteLobbyDisabled} onClick={handleDeleteLobby} >Delete Lobby</Button>
     </div>
   );
 }

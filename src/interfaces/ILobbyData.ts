@@ -27,6 +27,7 @@ export interface ScoreboardData {
 export interface RoundData {
   cards: number;
   isJeopardyMode: boolean;
+  isJeopardyModeRoundFinished: boolean;
   round: number;
 }
 export interface PlayerDataDict {
@@ -36,6 +37,7 @@ export interface PlayerData {
   name: string;
   bid: number;
   score: number;
+  wager: number;
 }
 
 export interface ScoreboardDataDict{

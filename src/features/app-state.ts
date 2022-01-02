@@ -44,6 +44,7 @@ export const {
   setLobbyCode,
   setLobbyUUID,
   setName,
+  setPlayerUUID
 } = appSlice.actions;
 
 export const selectIsLoggedIn = (state: RootState) => state.app.isLoggedIn;

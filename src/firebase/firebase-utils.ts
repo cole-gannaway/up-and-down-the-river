@@ -101,7 +101,6 @@ export async function deleteLobby(db: Database, lobbyCode: string, lobbyUUID: st
 export async function findPlayerByNameInLobby(db: Database, lobbyUUID: string, playerName: string) {
   const path = firebasePathConcat(["lobbies", lobbyUUID, "live", "players"]);
   const playersRef = ref(db, path);
-  let retVal: boolean = false;
   try {
     const snapshot = await get(playersRef)
     if (snapshot.exists()) {
@@ -126,7 +125,8 @@ export async function addPlayerToLobby(db: Database, playerName :string, lobbyUU
     [playerUUID]: {
       bid: 0,
       score: 0,
-      name: playerName
+      name: playerName,
+      wager: 0
     }
   }
   const successful = await updateAndMergeData(lobbyScoreboardRef, scoreboardUpdate)
@@ -140,14 +140,28 @@ export async function deletePlayerFromLobby(db: Database, playerUUID: string, lo
   remove(playerRef);
 }
 
-export async function updateRoundData(db: Database, roundDataUpdate: RoundData, lobbyUUID: string) {
-  const headerRef = ref(db, firebasePathConcat(["lobbies", lobbyUUID, "live","roundData"]));
-  return await updateAndMergeData(headerRef, roundDataUpdate);
+/**
+ * Applies a partial update to overwrite values on an object
+ * @param partialUpdate 
+ * @param originalData 
+ * @returns 
+ */
+function applyPartialUpdate(partialUpdate: any, originalData: any){
+  const data: any = {...originalData};
+  Object.keys(partialUpdate).forEach((key) => data[key] = partialUpdate[key]);
+  return data;
 }
 
-export async function updateScoreboard(db: Database, scoreboardUpdate: PlayerDataDict, lobbyUUID: string) {
+export async function updateRoundData(db: Database, roundDataUpdate: Partial<RoundData>, originalData: RoundData, lobbyUUID: string) {
+  const updatedData = applyPartialUpdate(roundDataUpdate,originalData);
+  const headerRef = ref(db, firebasePathConcat(["lobbies", lobbyUUID, "live","roundData"]));
+  return await updateAndMergeData(headerRef, updatedData);
+}
+
+export async function updateScoreboard(db: Database, scoreboardUpdate: PlayerDataDict, originalData: PlayerDataDict, lobbyUUID: string) {
+  const updatedData = applyPartialUpdate(scoreboardUpdate,originalData);
   const scoreboardRef = ref(db, firebasePathConcat(["lobbies", lobbyUUID, "live", "players"]));
-  return await updateAndMergeData(scoreboardRef, scoreboardUpdate);
+  return await updateAndMergeData(scoreboardRef, updatedData);
 }
 
 export async function updateHistory(db: Database, historyUpdate: ScoreboardDataDict, lobbyUUID: string) {
@@ -230,7 +244,8 @@ export function transformPlayersDataIntoAnArray(playerDataDict: PlayerDataDict){
       uuid: key,
       name: playerDataDict[key].name, 
       bid: playerDataDict[key].bid,
-      score: playerDataDict[key].score
+      score: playerDataDict[key].score,
+      wager: playerDataDict[key].wager
     }
   })
 }

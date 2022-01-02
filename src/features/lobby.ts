@@ -12,6 +12,7 @@ export function createEmptyLobbyData(){
       roundData: {
         cards: 7,
         isJeopardyMode: false,
+        isJeopardyModeRoundFinished: false,
         round: 1,
       }
     },

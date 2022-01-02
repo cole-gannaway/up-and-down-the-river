@@ -3,11 +3,10 @@ import { Database } from 'firebase/database';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { db } from './config/firebase';
-import { selectLobbyCode, selectName, setIsLoggedIn, setLobbyCode, setLobbyUUID, setName } from './features/app-state';
+import { selectLobbyCode, selectName, setIsLoggedIn, setLobbyCode, setLobbyUUID, setName, setPlayerUUID } from './features/app-state';
 import { addPlayerToLobby, createNewLobby, getLobbyUUID, findPlayerByNameInLobby } from './firebase/firebase-utils';
 import { validateText } from './utils/utils';
 import { useSnackbar } from 'notistack';
-import { v4 as uuidv4 } from 'uuid';
 
 function Login() {
   const dispatch = useAppDispatch();
@@ -29,7 +28,8 @@ function Login() {
       }
       if (playerUUID) {
         dispatch(setLobbyUUID(lobbyUUID));
-        dispatch(setIsLoggedIn(true))
+        dispatch(setIsLoggedIn(true));
+        dispatch(setPlayerUUID(playerUUID))
         return true;
       }
       else {
