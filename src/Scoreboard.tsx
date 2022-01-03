@@ -22,13 +22,11 @@ export function Scoreboard() {
     async function handleUpdateScoreboard(scoreboardUpdate: PartialPlayerDataDict) {
         if (lobbyUUID) {
             await updateScoreboard(db, scoreboardUpdate, lobby.live.players , lobbyUUID);
-            return true;
         }
-        return false;
     }
 
     async function handleUpdatePlayerName(playerUUID: string, updatedPlayerName: string){
-        const success = await handleUpdateScoreboard({ [playerUUID]: { name: updatedPlayerName.toLocaleUpperCase()} });
+        await handleUpdateScoreboard({ [playerUUID]: { name: updatedPlayerName.toLocaleUpperCase()} });
     }
 
     return <div>
