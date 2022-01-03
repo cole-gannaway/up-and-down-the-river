@@ -33,6 +33,10 @@ export interface RoundData {
 export interface PlayerDataDict {
   [playerUUID: string]: PlayerData
 }
+
+export interface PartialPlayerDataDict {
+  [playerUUID: string]: Partial<PlayerData>
+}
 export interface PlayerData {
   name: string;
   bid: number;

@@ -2,7 +2,7 @@ import { Button, Switch, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { db } from './config/firebase';
-import { selectLobbyCode, selectLobbyUUID, selectName, setIsLoggedIn, setLobbyCode, setLobbyUUID } from './features/app-state';
+import { selectLobbyCode, selectLobbyUUID, selectPlayerUUID, setLobbyCode, setLobbyUUID } from './features/app-state';
 import { selectLobbyData } from './features/lobby';
 import { deleteLobby, updateHistory, updateScoreboard, updateRoundData, addPlayerToLobby, generateRandomLobbyCode } from './firebase/firebase-utils';
 import { PlayerDataDict, RoundData, ScoreboardDataDict } from './interfaces/ILobbyData';
@@ -12,6 +12,7 @@ import { Scoreboard } from './Scoreboard';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { parseNumber } from './utils/utils';
 
 function Main() {
   const dispatch = useAppDispatch();
@@ -20,19 +21,18 @@ function Main() {
 
   const lobby = useAppSelector(selectLobbyData);
   const roundData = lobby.live.roundData;
-  const name = useAppSelector(selectName)
+  const playerUUID = useAppSelector(selectPlayerUUID);
+  const playerName = playerUUID ? lobby.live.players[playerUUID].name : "";
   const lobbyUUID = useAppSelector(selectLobbyUUID);
   const lobbyCode = useAppSelector(selectLobbyCode);
   const cardsPerRound = [7, 6, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 6, 7];
 
 
   async function handleDeleteLobby() {
-    console.log(lobbyUUID)
     if (lobbyUUID) {
       await deleteLobby(db, lobbyCode, lobbyUUID)
       dispatch(setLobbyCode(""))
       dispatch(setLobbyUUID(null));
-      dispatch(setIsLoggedIn(false));
     }
   }
 
@@ -43,17 +43,7 @@ function Main() {
       await updateRoundData(db, roundDataUpdate, roundData, lobbyUUID);
     }
   }
-
-  /**
-   * Helper function to parse numbers from inputs, 0 by default
-   * @param e 
-   * @returns 
-   */
-  function parseNumber(val: string) {
-    const newVal = parseInt(val)
-    if (newVal) return newVal;
-    else return 0;
-  }
+  
   function calculateCards(round: number) {
     const index = round - 1;
     if (index < 0) {
@@ -62,7 +52,6 @@ function Main() {
       return cardsPerRound[cardsPerRound.length - 1] + (index - cardsPerRound.length);
     }
     else {
-      console.log(index)
       return cardsPerRound[index];
     }
   }
@@ -106,7 +95,7 @@ function Main() {
   return (
     <div>
       <div>
-        <div><h4 style={{ display: "inline-block" }}>Welcome '{name}'!</h4> <h4 style={{ display: "inline-block" }}>Lobby Code: '</h4><h4 style={{ display: "inline-block", color: "blue" }}>{lobbyCode}</h4><h4 style={{ display: "inline-block" }}>'</h4></div>
+        <div><h4 style={{ display: "inline-block" }}>Welcome '{playerName}'!</h4> <h4 style={{ display: "inline-block" }}>Lobby Code: '</h4><h4 style={{ display: "inline-block", color: "blue" }}>{lobbyCode}</h4><h4 style={{ display: "inline-block" }}>'</h4></div>
         <div>
           <h3><Button onClick={() => changeRound(lobby.live.roundData.round - 1)}><ArrowBackIosIcon></ArrowBackIosIcon></Button> Round {lobby.live.roundData.round} <Button onClick={() => changeRound(lobby.live.roundData.round + 1)}><ArrowForwardIosIcon></ArrowForwardIosIcon></Button></h3>
         </div>

@@ -2,7 +2,7 @@ import { Database, DatabaseReference, get, ref, remove, set, update } from 'fire
 
 import { v4 as uuidv4 } from 'uuid';
 import { createEmptyLobbyData } from '../features/lobby';
-import { LobbyData, PlayerDataDict, RoundData, ScoreboardDataDict } from '../interfaces/ILobbyData';
+import { LobbyData, PartialPlayerDataDict, PlayerDataDict, RoundData, ScoreboardDataDict } from '../interfaces/ILobbyData';
 
 /**
  * Generates a random code for a lobby
@@ -158,7 +158,7 @@ export async function updateRoundData(db: Database, roundDataUpdate: Partial<Rou
   return await updateAndMergeData(headerRef, updatedData);
 }
 
-export async function updateScoreboard(db: Database, scoreboardUpdate: PlayerDataDict, originalData: PlayerDataDict, lobbyUUID: string) {
+export async function updateScoreboard(db: Database, scoreboardUpdate: PartialPlayerDataDict, originalData: PlayerDataDict, lobbyUUID: string) {
   const updatedData = applyPartialUpdate(scoreboardUpdate,originalData);
   const scoreboardRef = ref(db, firebasePathConcat(["lobbies", lobbyUUID, "live", "players"]));
   return await updateAndMergeData(scoreboardRef, updatedData);

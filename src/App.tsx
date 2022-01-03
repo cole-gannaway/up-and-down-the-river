@@ -2,17 +2,19 @@ import { onValue, ref } from 'firebase/database';
 import React, { useEffect } from 'react';
 import { db } from './config/firebase';
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { selectIsLoggedIn, selectLobbyUUID} from './features/app-state';
+import { selectLobbyUUID, selectPlayerUUID} from './features/app-state';
 import Login from './Login';
 import Main from './Main';
-import {  setLobbyData } from './features/lobby';
+import {  createEmptyLobbyData, selectLobbyData, setLobbyData } from './features/lobby';
 import { LobbyData } from './interfaces/ILobbyData';
 import img from './assets/card-game-64.png'
 
 function App() {
   const dispatch = useAppDispatch();
-  const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const lobbyUUID = useAppSelector(selectLobbyUUID);
+  const lobbyData = useAppSelector(selectLobbyData);
+  const playerUUID = useAppSelector(selectPlayerUUID);
+  let isLoggedIn = (lobbyData.live.players && Object.keys(lobbyData.live.players).find(uuid => uuid === playerUUID)) ? true : false;
 
   useEffect(() => {
     let unsubscribe = () => { };
@@ -27,6 +29,7 @@ function App() {
           dispatch(setLobbyData(lobby))
         } else {
           console.log('No data available');
+          dispatch(setLobbyData(createEmptyLobbyData()))
         }
       });
     }
