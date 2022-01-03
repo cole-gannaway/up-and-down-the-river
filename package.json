@@ -2,7 +2,7 @@
   "name": "up-and-down-the-river",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://cole-gannaway.github.io/up-and-down-the-river/",
+  "homepage": "",
   "dependencies": {
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
