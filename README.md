@@ -1,44 +1,52 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
+# Up And Down the River
 
-## Available Scripts
+Spend **less time** calculating scores and **more time** enjoying the card game with friends! This website allows players to enjoy the classic card game "Up And Down the River" without the need to physically keep score on pen and paper. Players can **create virtual game rooms**, invite friends to join, and play together in **real-time**. Let the website keeps track of score each round and the **history** of the game. If your group is feeling adventurous, turn on **Jeoparady mode** and each person can wager their own score. Only you will be able to see what you have risked and at the end of the round have the opportunity to double your score! Have fun!
 
-In the project directory, you can run:
+## Table of Contents
 
-### `npm start`
+- [Features](#features)
+- [Demo](#demo)
+- [Installation](#installation)
+- [Technologies Used](#technologies-used)
+- [Contributing](#contributing)
+- [License](#license)
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+## Features
 
-### `npm test`
+- Multiplayer Lobbies: Engage in thrilling multiplayer gameplay as you connect with friends across multiple devices in real-time.
+- Game Modes: Immerse yourself in the excitement of our Jeopardy mode, where you have the opportunity to unleash your competitive spirit by risking a portion or all of your hard-earned score on each round, adding an extra layer of thrill and strategy to your gameplay.
+- History: Dive into the detailed history of each round, ensuring precise score keeping and fostering a harmonious gaming environment, where fairness and camaraderie prevail.
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Demo
 
-### `npm run build`
+You can access the live website [here](https://www.colegannaway.com/up-and-down-the-river/).
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Installation
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+As this is a live website, there is **no installation required**. Simply open the provided link in your web browser to access the Financial Planner website. However if you'd like to test locally:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repository: `git clone https://github.com/cole-gannaway/up-and-down-the-river.git`
+2. Navigate to the project directory: `cd up-and-down-the-river`
+3. In the project directory, you can run:
+    - ### `npm run start`
+    - Runs the app in the development mode.<br />
+    - Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Technologies Used
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The Financial Planner website utilizes the following technologies:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- [React](https://react.dev/)
+- [Redux](https://redux.js.org/)
+- [Material UI](https://www.mui.com/)
+- [ChartJS](https://www.chartjs.org/)
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Contributing
 
-## Learn More
+As this website is the personal project of Cole Gannaway, external contributions are not accepted at this time.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## License
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The contents of this repository are licensed under the [MIT License](LICENSE).
