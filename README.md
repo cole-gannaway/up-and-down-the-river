@@ -24,7 +24,7 @@ You can access the live website [here](https://www.colegannaway.com/up-and-down-
 
 ## Installation
 
-As this is a live website, there is **no installation required**. Simply open the provided link in your web browser to access the Financial Planner website. However if you'd like to test locally:
+As this is a live website, there is **no installation required**. Simply open the provided link in your web browser to access the Up And Down the River website. However if you'd like to test locally:
 
 1. Clone the repository: `git clone https://github.com/cole-gannaway/up-and-down-the-river.git`
 2. Navigate to the project directory: `cd up-and-down-the-river`
@@ -36,7 +36,7 @@ As this is a live website, there is **no installation required**. Simply open th
 
 ## Technologies Used
 
-The Financial Planner website utilizes the following technologies:
+The Up And Down the River website utilizes the following technologies:
 
 - [React](https://react.dev/)
 - [Redux](https://redux.js.org/)
