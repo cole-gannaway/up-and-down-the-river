@@ -41,7 +41,7 @@ The Up And Down the River website utilizes the following technologies:
 - [React](https://react.dev/)
 - [Redux](https://redux.js.org/)
 - [Material UI](https://www.mui.com/)
-- [ChartJS](https://www.chartjs.org/)
+- [Firebase](https://firebase.google.com/)
 
 ## Contributing
 
